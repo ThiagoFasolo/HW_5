@@ -14,7 +14,7 @@ class Evo:
         self.fitness = {} # name --> objective function
         self.agents = {} # name --> (operator function, num_solutions_input)
 
-    def add_fitness_criteria(self, name, f):
+    def add_objective(self, name, f):
         """ Register an objective with the environment """
         self.fitness[name] = f
 
@@ -28,9 +28,6 @@ class Evo:
         """ Add a solution to the population   """
         eval = tuple([(name, f(sol)) for name, f in self.fitness.items()])
         self.pop[eval] = sol   # ((name1, objval1), (name2, objval2)....)  ===> solution
-
-
-
 
     def get_random_solutions(self, k=1):
         """ Pick k random solutions from the population """
