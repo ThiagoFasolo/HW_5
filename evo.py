@@ -14,9 +14,30 @@ class Evo:
         self.fitness = {} # name --> objective function
         self.agents = {} # name --> (operator function, num_solutions_input)
 
-    def add_objective(self, name, f):
+    def overallocation(self, sol):
+    # Iterates through each TA's assignment and find the maximum allowance
+        return sum(max(0, assigned - max_assigned) for ta, assigned, max_assigned in sol)
+
+    def conflicts(self, sol):
+        # For each TA in sol (solution), if duplicate indicating a conflict then it is counted
+        return len({ta for ta, times, in sol if len(times) != len(set(times))})
+
+    def undersupported(self, sol):
+        # Iterates through each TA's assignement, and if it meets or exceeds min TA then adds 0
+        return sum(max(0, min_ta - assigned) for ta, assigned, min_ta in sol)
+
+    def unavailable(self, sol):
+        # If prefrence = U in sol then it adds 1
+        return sum(1 for ta, section, pref in sol if pref == 'U')
+
+    def willing(self, sol):
+        # If prefrence = W in sol then it adds 1
+        return sum(1 for ta, section, pref in sol if pref == 'W')
+
+    def add_fitness_criteria(self, name, f):
         """ Register an objective with the environment """
         self.fitness[name] = f
+
 
     def add_agent(self, name, op, k=1):
         """ Register an agent with the environment
@@ -58,7 +79,6 @@ class Evo:
         return min(score_diffs) >= 0 and max(score_diffs) > 0.0
 
 
-
     def reduce_nds(self, S, p):
         return S - {q for q in S if self.dominates(p, q)}
 
@@ -89,10 +109,12 @@ class Evo:
 
     def __str__(self):
         """ Output the solutions in the population """
-        rslt = ""
+        header = "groupname,overallocation,conflicts,undersupport,unwilling,unpreferred\n"
+        groupname = "Group1"
         for eval, sol in self.pop.items():
-            rslt += str(eval) + ":\t" + str(sol) + "\n"
-        return rslt
+            eval_dict = {name: score for name, score in eval}
+            header += f"{groupname},{eval_dict['overallocation']},{eval_dict['conflicts']},{eval_dict['undersupport']},{eval_dict['unwilling']},{eval_dict['unpreferred']}\n"
+        return header
 
 
 
