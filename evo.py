@@ -26,11 +26,11 @@ class Evo:
         # Iterates through each TA's assignement, and if it meets or exceeds min TA then adds 0
         return sum(max(0, min_ta - assigned) for ta, assigned, min_ta in sol)
 
-    def unavailable(self, sol):
+    def unwilling(self, sol):
         # If prefrence = U in sol then it adds 1
         return sum(1 for ta, section, pref in sol if pref == 'U')
 
-    def willing(self, sol):
+    def unpreferred(self, sol):
         # If prefrence = W in sol then it adds 1
         return sum(1 for ta, section, pref in sol if pref == 'W')
 
