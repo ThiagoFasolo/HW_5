@@ -1,38 +1,72 @@
 """
 evo.py: An evolutionary computing framework
 """
-
 import random as rnd
 import copy
 from functools import reduce
 import numpy as np
 
+
+
+
+
+
+
 class Evo:
+    import numpy as np
 
-    def __init__(self):
-        self.pop = {}     # evaluation --> solution
-        self.fitness = {} # name --> objective function
-        self.agents = {} # name --> (operator function, num_solutions_input)
+    class Evo:
+        def __init__(self, tas_n, sect_n):
+            self.tas_n = tas_n  # TA information, including max assignments and willingness
+            self.sect_n = sect_n  # Section information, including meeting times and min TAs required
+            # Initialize other components like pop, fitness, agents
 
-    def overallocation(self, sol):
-    # Iterates through each TA's assignment and find the maximum allowance
-        return sum(max(0, assigned - max_assigned) for ta, assigned, max_assigned in sol)
+        def overallocation(self, array):
+            ta_alloc = array.sum(axis=1)  # Sum assignments for each TA across sections
+            ta_req = self.tas_n[:, 1]  # Max assigned column from tas_n
 
-    def conflicts(self, sol):
-        # For each TA in sol (solution), if duplicate indicating a conflict then it is counted
-        return len({ta for ta, times, in sol if len(times) != len(set(times))})
+            difference = ta_alloc - ta_req
+            print("Overallocation Differences:", difference)
+            difference[difference < 0] = 0  # Ignore under-allocation
 
-    def undersupported(self, sol):
-        # Iterates through each TA's assignement, and if it meets or exceeds min TA then adds 0
-        return sum(max(0, min_ta - assigned) for ta, assigned, min_ta in sol)
+            return np.sum(difference)
 
-    def unwilling(self, sol):
-        # If prefrence = U in sol then it adds 1
-        return sum(1 for ta, section, pref in sol if pref == 'U')
+        def time_conflicts(self, array):
+            conflicts = 0
+            section_times = self.sect_n[:, 1]  # Assuming 2nd column in sect_n represents meeting time
+            print(self.sect_n)
+
+            # Iterate over each TA
+            for ta_idx in range(array.shape[0]):
+                assigned_sections = np.where(array[ta_idx, :] == 1)[0]  # Sections assigned to TA
+                assigned_times = section_times[assigned_sections]  # Times for assigned sections
+
+                # Count as a conflict if duplicate times exist
+                if len(assigned_times) != len(set(assigned_times)):
+                    conflicts += 1  # Only one conflict per TA, regardless of multiple conflicts
+
+            return conflicts
+
+        def undersupport(self, array):
+            required_tas = self.sect_n[:, -2]  # Assuming last column in sect_n is 'min_tas_required'
+            actual_tas = array.sum(axis=0)  # Count of TAs assigned per section
+
+            under_support = required_tas - actual_tas
+            under_support[under_support < 0] = 0  # No penalty if actual meets/exceeds required
+
+            return np.sum(under_support)
+
+        def unwilling(self, array):
+            penalty = 0
+            for ta_idx in range(array.shape[0]):
+                for sec_idx in range(array.shape[1]):
+                    # Check if TA is assigned but unwilling (0 means unwilling in tas_n)
+                    if array[ta_idx, sec_idx] == 1 and self.tas_n[ta_idx, sec_idx + 2] == 0:
+                        penalty += 1
+            return penalty
 
     def unpreferred(self, sol):
-        # If prefrence = W in sol then it adds 1
-        return sum(1 for ta, section, pref in sol if pref == 'W')
+        return sum(1 for entry in sol if entry['preference'] == 'W')
 
     def add_fitness_criteria(self, name, f):
         """ Register an objective with the environment """
