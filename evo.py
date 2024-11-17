@@ -7,14 +7,6 @@ from functools import reduce
 import numpy as np
 
 
-
-
-
-
-
-class Evo:
-    import numpy as np
-
     class Evo:
         def __init__(self, tas_n, sect_n):
             self.tas_n = tas_n  # TA information, including max assignments and willingness
