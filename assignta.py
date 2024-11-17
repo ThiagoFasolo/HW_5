@@ -1,7 +1,8 @@
 import pandas as pd
 from readfile import read_tasect
 import numpy as np
-from criterias import overalloc, time_conflicts, undersupport, unwilling, unpreffered, testfiles, tas_n, sect_n
+from criterias import overalloc, time_conflicts, undersupport, unwilling, unpreffered, testfiles
+from criterias import tas_n, sect_n
 from agents import mutating_agent, min_agent
 from ivan_evo import Evo
 
@@ -30,5 +31,5 @@ E.add_solution(array)
 E.add_solution(array1)
 
 print(E)
-# E.evolve(time_limit=300, dom=100, status=1000)
-# print(E)
+E.evolve(time_limit=300, dom=100, status=1000, mutate = 4, mut_fact = 100)
+print(E)
