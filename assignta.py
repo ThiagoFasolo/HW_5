@@ -5,6 +5,7 @@ from criterias import overalloc, time_conflicts, undersupport, unwilling, unpref
 from criterias import tas_n, sect_n
 from agents import mutating_agent, min_agent, min_agent_ran, add_preferred_courses
 from evo import Evo
+from profiler import Profiler, profile
 
 # read and test the test files
 testfiles('test1.csv', 'test2.csv', 'test3.csv')
@@ -35,4 +36,6 @@ E.add_solution(array1)
 
 E.evolve(time_limit=30, dom=100, status=100000, mutate = 4, mut_fact = 100)
 print(E)
+
+Profiler.report()
 

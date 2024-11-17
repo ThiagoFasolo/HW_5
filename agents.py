@@ -1,8 +1,11 @@
 import numpy as np
 from criterias import tas_n, sect_n
+from profiler import profile, Profiler
+
 global tas_n
 global sect_n
 
+@profile
 def mutating_agent(sol, num_changes):
     '''' Randomly mutates a given solution matriz by flipping values at specific positions
     Takes in 2D array and number of mutations applied'''
@@ -12,12 +15,14 @@ def mutating_agent(sol, num_changes):
     #
     return sol
 
+@profile
 def min_agent(sols):
     ''' agent multiplies two matrixes
     finds what values are the same'''
     return sols[0] * sols[1]
 
 
+@profile
 def min_agent_ran(sols):
     '''
     Agent multiplies two matrices element-wise.
@@ -34,7 +39,8 @@ def min_agent_ran(sols):
     # Find the indices of zeros in the matrix
     zero_indices = np.where(sol == 0)
     zero_indices_list = list(zip(zero_indices[0], zero_indices[1]))
-    # Determine the number of zero positions to turn into 1s (randomly select a subset)
+    # Determine the number of
+    # zero positions to turn into 1s (randomly select a subset)
     num_random_ones = int(len(zero_indices_list) * 0.25)  # e.g., 20% of zeros are converted to 1s
     random_indices = np.random.choice(len(zero_indices_list), num_random_ones, replace=False)
     # Set randomly selected zero positions to 1
@@ -45,7 +51,7 @@ def min_agent_ran(sols):
     return sol
 
 
-
+@profile
 def add_preferred_courses(sol):
     # MAY NOT WORK BECAUSE OF IT NEEDS A DICT FOR PREFFERED CLASS. MAYBE YOU CAN MAKE IT WORK
     """
@@ -70,6 +76,7 @@ def add_preferred_courses(sol):
     return sol
 
 
+@ profile
 def remove_time_conflicts(sol, time_blocks):
     # SAME ISSUE AS ABOVE
     """
