@@ -119,7 +119,7 @@ class Evo:
             sum = 0
             for name, score in eval:
                 rslt += f'{name[:2]}:{score} '
-                sum =+ score
+                sum += score
             rslt += f'\t sum: {sum} \n'
 
         return rslt
