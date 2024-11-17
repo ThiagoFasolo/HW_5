@@ -1,5 +1,6 @@
 import numpy as np
 from readfile import read_tasect
+from profiler import profile, Profiler
 
 global tas_n
 global sect_n
@@ -9,6 +10,7 @@ tas_n = tas.to_numpy()
 sect_n = sect.to_numpy()
 
 # Overallocation penalty calculation
+@profile
 def overalloc(array):
     ta_alloc = array.sum(axis=0)
     ta_req = tas_n[:, 1]  # Max assigned column
@@ -19,6 +21,7 @@ def overalloc(array):
 
 
 # Time conflict penalty calculation
+@profile
 def time_conflicts(array):
     conflicts = 0
     for ta_idx in range(array.shape[1]):
@@ -31,6 +34,7 @@ def time_conflicts(array):
 
 
 # Under-support penalty calculation
+@profile
 def undersupport(array):
     required_tas = sect_n[:, 2]  # min ta
     actual_tas = array.sum(axis=1)
@@ -42,6 +46,7 @@ def undersupport(array):
 
 
 # Unwilling penalty calculations
+@profile
 def unwilling(array):
     matrix = array * (tas_n[:, 2:]).T
     unwilling = np.count_nonzero(matrix == 1)
@@ -49,11 +54,11 @@ def unwilling(array):
 
 
 # Unpreffered penalty calculations
+@profile
 def unpreffered(array):
     matrix = array * (tas_n[:, 2:]).T
     unprefered = np.count_nonzero(matrix == 2)
     return unprefered
-
 
 def calc_objs(array):
     # Calculate objectives

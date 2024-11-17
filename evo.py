@@ -114,10 +114,13 @@ class Evo:
 
     def __str__(self):
         """ Output the solutions in the population """
-        rslt = "overalloc, time_conflicts, undersupport, unwilling,unpreffered" + "\n"
+        rslt = "overalloc, time_conflicts, undersupport, unwilling, unpreffered" + "\n"
         for eval, sol in self.pop.items():
             eval_dict = {name: score for name, score in eval}
-            rslt += f"{eval_dict['overalloc']},{eval_dict['time_conflicts']},{eval_dict['undersupport']},{eval_dict['unwilling']},{eval_dict['unpreffered']}\n"
+            # for key in ['overalloc', 'time_conflicts', 'undersupport', 'unwilling', 'unpreffered']:
+            #     eval_dict[key]
+            rslt += f"{eval_dict['overalloc']},{eval_dict['time_conflicts']},{eval_dict['undersupport']}",
+            "{eval_dict['unwilling']},{eval_dict['unpreffered']}", f"{sum.()}", "\n"
         return rslt
 
 
