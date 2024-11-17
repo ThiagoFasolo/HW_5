@@ -2,15 +2,15 @@ import numpy as np
 import pandas as pd
 from criterias import overalloc, time_conflicts, undersupport, unwilling, unpreffered, calc_objs
 
-# Load data from 'test1.csv' as sample_array
-file = 'test1.csv'
-# sample_array = pd.read_csv('test1.csv').values
-# t_array = np.genfromtxt(file, delimiter=',', skip_header=0).T
-sample_array = np.genfromtxt(file, delimiter=',', skip_header=0).T
-
-def test_objectives(test_file, result_file, *objectives)
+def test_objectives(test_files = ['test1.csv', 'test2.csv', 'test3.csv'], result_file = ['test1_res.csv', 'test2_res.csv', 'test3_res.csv'], *objectives)
     result = overalloc(sample_array)
+    t_array = np.genfromtxt(test_files, delimiter=',', skip_header=0).T
+    r_array = np.genfromtxt(result_file, delimiter=',', skip_header=0).T
+    res = obj
+    for obj in objectives:
+        res += obj(t_array)
     expected_value = None  # Define expected value for overallocation based on sample data
+
 # Test cases
 def test_overalloc():
     result = overalloc(sample_array)
