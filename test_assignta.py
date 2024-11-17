@@ -1,40 +1,45 @@
 import numpy as np
-from criterias import overalloc, time_conflicts, undersupport, unwilling, unpreffered, calc_objs, testfiles
+import pandas as pd
+from criterias import overalloc, time_conflicts, undersupport, unwilling, unpreffered, calc_objs
 
-test_arrays = testfiles('test1.csv', 'test2.csv', 'test3.csv')
-print(test_arrays)
+# Load data from 'test1.csv' as sample_array
+sample_array = pd.read_csv('test1.csv').values
 
 # Test cases
 def test_overalloc():
     result = overalloc(sample_array)
-    assert result == expected_value  # Replace with expected value based on sample data
+    expected_value = None  # Define expected value for overallocation based on sample data
+    assert result == expected_value, f"Expected {expected_value}, got {result}"
 
 def test_time_conflicts():
     result = time_conflicts(sample_array)
-    assert result == expected_value  # Replace with expected value based on sample data
+    expected_value = None  # Define expected value for time conflicts based on sample data
+    assert result == expected_value, f"Expected {expected_value}, got {result}"
 
 def test_undersupport():
     result = undersupport(sample_array)
-    assert result == expected_value  # Replace with expected value based on sample data
+    expected_value = None  # Define expected value for undersupport based on sample data
+    assert result == expected_value, f"Expected {expected_value}, got {result}"
 
 def test_unwilling():
     result = unwilling(sample_array)
-    assert result == expected_value  # Replace with expected value based on sample data
+    expected_value = None  # Define expected value for unwilling penalty based on sample data
+    assert result == expected_value, f"Expected {expected_value}, got {result}"
 
 def test_unpreferred():
     result = unpreffered(sample_array)
-    assert result == expected_value  # Replace with expected value based on sample data
+    expected_value = None  # Define expected value for unpreferred penalty based on sample data
+    assert result == expected_value, f"Expected {expected_value}, got {result}"
 
-def test_calc_objs(capsys):
+def test_calc_objs():
+    # Use calc_objs directly for combined penalty outputs
     calc_objs(sample_array)
-    captured = capsys.readouterr()
-    # Define assertions based on expected printed output
 
-# To test the testfiles function
-def test_testfiles():
-    # Test file paths
-    testfile_paths = ["testfile1.csv", "testfile2.csv"]
-    testfiles(*testfile_paths)
-    # Add assertions or validations for expected behavior if possible
-
-# Replace expected_value with correct values based on your logic for each function.
+# Run tests
+if __name__ == '__main__':
+    test_overalloc()
+    test_time_conflicts()
+    test_undersupport()
+    test_unwilling()
+    test_unpreferred()
+    test_calc_objs()
