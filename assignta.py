@@ -33,7 +33,7 @@ array1 = np.random.randint(0, 2, size=(len(sect_n), len(tas_n)))
 E.add_solution(array)
 E.add_solution(array1)
 
-
+print(E)
 E.evolve(time_limit=30, dom=100, status=100000, mutate = 4, mut_fact = 100)
 print(E)
 
