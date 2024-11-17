@@ -1,7 +1,5 @@
 import numpy as np
 def mutating_agent(sol, num_changes):
-    print('Sol', sol.size)
-    print('num_changes', num_changes)
     indices = np.random.choice(sol.size, num_changes, replace=False)
     row_indices, col_indices = np.unravel_index(indices, sol.shape)
     sol[row_indices, col_indices] = 1 - sol[row_indices, col_indices]
