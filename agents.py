@@ -1,4 +1,5 @@
 import numpy as np
+from criterias import tas_n, sect_n
 def mutating_agent(sol, num_changes):
     indices = np.random.choice(sol.size, num_changes, replace=False)
     row_indices, col_indices = np.unravel_index(indices, sol.shape)
@@ -11,6 +12,7 @@ def min_agent(sols):
     return sols[0] * sols[1]
 
 def min_agent_wran(sols):
+    # DOES NOT WORK
     ''' agent multiplies two matrixes
     fills the remaining 0s with random 1s'''
     sol = sols[0] * sols[1]
