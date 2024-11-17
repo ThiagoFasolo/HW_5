@@ -9,7 +9,6 @@ from evo import Evo
 # read and test the test files
 testfiles('test1.csv', 'test2.csv', 'test3.csv')
 
-
 # create the environment
 E = Evo()
 
