@@ -4,7 +4,7 @@ import numpy as np
 from criterias import overalloc, time_conflicts, undersupport, unwilling, unpreffered, testfiles
 from criterias import tas_n, sect_n
 from agents import mutating_agent, min_agent, min_agent_ran, add_preferred_courses
-from ivan_evo import Evo
+from evo import Evo
 
 # read and test the test files
 testfiles('test1.csv', 'test2.csv', 'test3.csv')

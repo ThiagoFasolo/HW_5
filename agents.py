@@ -1,5 +1,7 @@
 import numpy as np
 from criterias import tas_n, sect_n
+global tas_n
+global sect_n
 
 def mutating_agent(sol, num_changes):
     '''' Randomly mutates a given solution matriz by flipping values at specific positions
@@ -31,10 +33,10 @@ def min_agent_ran(sols):
     sol = sols[0] * sols[1]
     # Find the indices of zeros in the matrix
     zero_indices = np.where(sol == 0)
-    print(zero_indices)
     zero_indices_list = list(zip(zero_indices[0], zero_indices[1]))
     # Determine the number of zero positions to turn into 1s (randomly select a subset)
-    num_random_ones = int(len(zero_indices_list) * 0.2)  # e.g., 20% of zeros are converted to 1s
+    num_random_ones = int(len(zero_indices_list) * 0.25)  # e.g., 20% of zeros are converted to 1s
+    print(num_random_ones)
     random_indices = np.random.choice(len(zero_indices_list), num_random_ones, replace=False)
     # Set randomly selected zero positions to 1
     for idx in random_indices:
@@ -44,7 +46,8 @@ def min_agent_ran(sols):
     return sol
 
 
-def add_preferred_courses(sol, preferred_courses):
+
+def add_preferred_courses(sol):
     # MAY NOT WORK BECAUSE OF IT NEEDS A DICT FOR PREFFERED CLASS. MAYBE YOU CAN MAKE IT WORK
     """
     Add preferred courses to the solution matrix for each TA without conflicts.
@@ -57,7 +60,7 @@ def add_preferred_courses(sol, preferred_courses):
     np.array: Updated solution matrix with preferred courses added where possible.
     """
     # Iterate over each TA and their preferred courses
-    for ta_index, courses in preferred_courses.items():
+    for ta_index, courses in tas_n:
         # Check if the TA already has an assigned course
         if not np.any(sol[ta_index, :]):  # Ensure no other courses are assigned to this TA
             for course_index in courses:

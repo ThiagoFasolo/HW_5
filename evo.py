@@ -1,69 +1,24 @@
 """
 evo.py: An evolutionary computing framework
 """
+
 import random as rnd
 import copy
 from functools import reduce
 import numpy as np
+import time
 
+class Evo:
 
-    class Evo:
-        def __init__(self, tas_n, sect_n):
-            self.tas_n = tas_n  # TA information, including max assignments and willingness
-            self.sect_n = sect_n  # Section information, including meeting times and min TAs required
-            # Initialize other components like pop, fitness, agents
+    def __init__(self):
+        self.pop = {}     # evaluation --> solution
+        self.objectives = {} # name --> objective function
+        self.agents = {} # name --> (operator function, num_solutions_input)
+        self.mut_agents = []
 
-        def overallocation(self, array):
-            ta_alloc = array.sum(axis=1)  # Sum assignments for each TA across sections
-            ta_req = self.tas_n[:, 1]  # Max assigned column from tas_n
-
-            difference = ta_alloc - ta_req
-            print("Overallocation Differences:", difference)
-            difference[difference < 0] = 0  # Ignore under-allocation
-
-            return np.sum(difference)
-
-        def time_conflicts(self, array):
-            conflicts = 0
-            section_times = self.sect_n[:, 1]  # Assuming 2nd column in sect_n represents meeting time
-            print(self.sect_n)
-
-            # Iterate over each TA
-            for ta_idx in range(array.shape[0]):
-                assigned_sections = np.where(array[ta_idx, :] == 1)[0]  # Sections assigned to TA
-                assigned_times = section_times[assigned_sections]  # Times for assigned sections
-
-                # Count as a conflict if duplicate times exist
-                if len(assigned_times) != len(set(assigned_times)):
-                    conflicts += 1  # Only one conflict per TA, regardless of multiple conflicts
-
-            return conflicts
-
-        def undersupport(self, array):
-            required_tas = self.sect_n[:, -2]  # Assuming last column in sect_n is 'min_tas_required'
-            actual_tas = array.sum(axis=0)  # Count of TAs assigned per section
-
-            under_support = required_tas - actual_tas
-            under_support[under_support < 0] = 0  # No penalty if actual meets/exceeds required
-
-            return np.sum(under_support)
-
-        def unwilling(self, array):
-            penalty = 0
-            for ta_idx in range(array.shape[0]):
-                for sec_idx in range(array.shape[1]):
-                    # Check if TA is assigned but unwilling (0 means unwilling in tas_n)
-                    if array[ta_idx, sec_idx] == 1 and self.tas_n[ta_idx, sec_idx + 2] == 0:
-                        penalty += 1
-            return penalty
-
-    def unpreferred(self, sol):
-        return sum(1 for entry in sol if entry['preference'] == 'W')
-
-    def add_fitness_criteria(self, name, f):
+    def add_objective(self, name, f):
         """ Register an objective with the environment """
-        self.fitness[name] = f
-
+        self.objectives[name] = f
 
     def add_agent(self, name, op, k=1):
         """ Register an agent with the environment
@@ -71,9 +26,14 @@ import numpy as np
         k defines the number of solutions input to the agent. """
         self.agents[name] = (op, k)
 
+    def add_mut_agent(self, op):
+        """ Register the mutating agent with enviornment
+        OP should take in a mutation factor parameter """
+        self.mut_agents.append(op)
+
     def add_solution(self, sol):
         """ Add a solution to the population   """
-        eval = tuple([(name, f(sol)) for name, f in self.fitness.items()])
+        eval = tuple([(name, f(sol)) for name, f in self.objectives.items()])
         self.pop[eval] = sol   # ((name1, objval1), (name2, objval2)....)  ===> solution
 
     def get_random_solutions(self, k=1):
@@ -93,7 +53,15 @@ import numpy as np
         new_solution = op(picks)
         self.add_solution(new_solution)
 
+    def run_mut_agents(self, num_changes):
+        ''' Randomize an agent based on a number of changes'''
+        for mutation in self.mut_agents:
+            sol = self.get_random_solutions(k=1)[0]
+            self.add_solution(mutation(sol, num_changes))
 
+    '''
+    DO WE STILL WANT TO USE THIS?
+    '''
     def dominates(self, p, q):
         """
         p = evaluation of one solution: ((obj1, score1), (obj2, score2), ... )
@@ -104,7 +72,6 @@ import numpy as np
         score_diffs = qscores - pscores
         return min(score_diffs) >= 0 and max(score_diffs) > 0.0
 
-
     def reduce_nds(self, S, p):
         return S - {q for q in S if self.dominates(p, q)}
 
@@ -112,35 +79,45 @@ import numpy as np
         nds = reduce(self.reduce_nds, self.pop.keys(), self.pop.keys())
         self.pop = {k: self.pop[k] for k in nds}
 
-    def evolve(self, n=1, dom=100, status=1000):
-        """ Run random agents n times
-        n:  Number of agent invocations
-        status: How frequently to output the current population
+    def evolve(self, time_limit=300, dom=100, status=1000, mutate = 4, mut_fact = 100):
+        """ Run random agents with a time limit.
+        time_limit: The maximum allowed time for running this method (in seconds).
+        dom: How frequently to check for and remove dominated solutions.
+        status: How frequently to output the current population status.
         """
+        start_time = time.time()  # Record the start time
         agent_names = list(self.agents.keys())
-        for i in range(n):
+        i = 0
+
+        while (time.time() - start_time) < time_limit:
+
             pick = rnd.choice(agent_names)
             self.run_agent(pick)
+
+            if i % mutate:
+                self.run_mut_agents(round((1 - (time.time() - start_time) / time_limit) * mut_fact))
 
             if i % dom == 0:
                 self.remove_dominated()
 
             if i % status == 0:
-                self.remove_dominated()
+                # Output the current status of the population
                 print("Iteration: ", i)
                 print("Size     : ", len(self.pop))
                 print(self)
 
-        self.remove_dominated()
+            i += 1
+
+        self.remove_dominated()  # Final removal of dominated solutions
+        print("Completed evolution process. Total iterations: ", i)
+
 
     def __str__(self):
         """ Output the solutions in the population """
-        header = "groupname,overallocation,conflicts,undersupport,unwilling,unpreferred\n"
-        groupname = "Group1"
+        rslt = "overalloc, time_conflicts, undersupport, unwilling,unpreffered" + "\n"
         for eval, sol in self.pop.items():
             eval_dict = {name: score for name, score in eval}
-            header += f"{groupname},{eval_dict['overallocation']},{eval_dict['conflicts']},{eval_dict['undersupport']},{eval_dict['unwilling']},{eval_dict['unpreferred']}\n"
-        return header
-
+            rslt += f"{eval_dict['overalloc']},{eval_dict['time_conflicts']},{eval_dict['undersupport']},{eval_dict['unwilling']},{eval_dict['unpreffered']}\n"
+        return rslt
 
 
