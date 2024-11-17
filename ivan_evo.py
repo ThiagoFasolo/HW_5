@@ -15,6 +15,7 @@ class Evo:
         self.objectives = {} # name --> objective function
         self.agents = {} # name --> (operator function, num_solutions_input)
         self.mut_agents = []
+
     def add_objective(self, name, f):
         """ Register an objective with the environment """
         self.objectives[name] = f
