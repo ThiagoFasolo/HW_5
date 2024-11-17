@@ -8,7 +8,7 @@ def read_tasect(tasfile='tas.csv', sectfile='sections.csv'):
     sect = pd.read_csv(sectfile)
 
     # Clean and prepare section data
-    clean_sect = sect.drop(columns=['instructor', 'location', 'students', 'topic'])
+    clean_sect = sect.drop(columns=['instructor', 'location', 'students', 'topic', 'max_ta'])
     clean_sect['daytime'], time_index = pd.factorize(clean_sect['daytime'])
 
     # Clean and prepare TA data

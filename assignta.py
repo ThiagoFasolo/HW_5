@@ -24,7 +24,7 @@ E.add_objective("unpreffered", unpreffered)
 E.add_mut_agent(mutating_agent)
 E.add_agent("min_agent", min_agent, k=2)
 E.add_agent("min_agent_ran", min_agent_ran, k=2)
-E.add_agent("add_preferred_courses", add_preferred_courses, k=1)
+# E.add_agent("add_preferred_courses", add_preferred_courses, k=1)
 # E.add_agent("", ___, k=num_sols_needed)
 
 # Create random initial solution matrix
@@ -34,6 +34,6 @@ E.add_solution(array)
 E.add_solution(array1)
 
 
-#E.evolve(time_limit=30, dom=100, status=100000, mutate = 4, mut_fact = 100)
-#print(E)
+E.evolve(time_limit=30, dom=100, status=100000, mutate = 4, mut_fact = 100)
+print(E)
 

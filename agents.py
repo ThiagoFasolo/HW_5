@@ -36,7 +36,6 @@ def min_agent_ran(sols):
     zero_indices_list = list(zip(zero_indices[0], zero_indices[1]))
     # Determine the number of zero positions to turn into 1s (randomly select a subset)
     num_random_ones = int(len(zero_indices_list) * 0.25)  # e.g., 20% of zeros are converted to 1s
-    print(num_random_ones)
     random_indices = np.random.choice(len(zero_indices_list), num_random_ones, replace=False)
     # Set randomly selected zero positions to 1
     for idx in random_indices:
