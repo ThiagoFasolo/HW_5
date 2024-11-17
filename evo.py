@@ -118,12 +118,10 @@ class Evo:
         for eval, sol in self.pop.items():
             sum = 0
             for name, score in eval:
-            result +=
-            eval_dict = {name: score for name, score in eval}
-            # for key in ['overalloc', 'time_conflicts', 'undersupport', 'unwilling', 'unpreffered']:
-            #     eval_dict[key]
-            rslt += f"{eval_dict['overalloc']},{eval_dict['time_conflicts']},{eval_dict['undersupport']}",
-            "{eval_dict['unwilling']},{eval_dict['unpreffered']}", f"{sum.()}", "\n"
+                rslt += f'{name[:2]}:{score} '
+                sum =+ score
+            rslt += f'\t sum: {sum} \n'
+
         return rslt
 
 
