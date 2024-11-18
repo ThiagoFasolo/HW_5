@@ -75,37 +75,59 @@ def add_preferred_courses(sol):
 
     return sol
 
+def find_conflicts(assignment, conflicting_labs):
+    conflicts = []
+
+    # Iterate over each group of conflicting labs
+    for conflict_group in conflicting_labs:
+        # Sum the assignments in the conflicting labs
+        sub_matrix = assignment[:, conflict_group]  # Selecting columns for the labs
+        conflicts_sum = np.sum(sub_matrix, axis=1)  # Sum along the columns now to get sum per TA
+
+        # Identify TAs with conflicts
+        # Conflict occurs if a TA is assigned to more than one lab in the group
+        conflict_indices = np.where(conflicts_sum > 1)[0]  # TAs indices with conflicts
+
+        # Append conflicts for each TA
+        for ta_index in conflict_indices:
+            # Find specific labs where the TA is assigned within this conflict group
+            assigned_labs = [lab for lab in conflict_group if assignment[ta_index, lab] == 1]
+            conflicts.append([(ta_index, lab) for lab in assigned_labs])
+
+    return conflicts
 @ profile
-def remove_time_conflicts(sol, time_blocks):
-    # SAME ISSUE AS ABOVE
+def resolve_time_conflicts(sol):
     """
-    Ensure each TA is assigned to only one time block, removing any conflicts.
-
-    Parameters:
-    sol (np.array): A 2D array where rows represent TAs and columns represent courses (1 if assigned, 0 if not).
-    time_blocks (list): A list where each entry represents the time block of the corresponding column in `sol`.
-
-    Returns:
-    np.array: Updated solution matrix with time conflicts removed.
+    Resolve time conflicts by ensuring each TA is only assigned to one lab per conflicting time block.
     """
-    # Iterate over each TA
-    for ta_index in range(sol.shape[0]):
-        # Dictionary to keep track of the first assignment in each time block
-        assigned_in_block = {}
+    # Copy the solution matrix
+    assignment = sol.copy()
 
-        # Iterate over each course assignment for the current TA
-        for course_index in range(sol.shape[1]):
-            if sol[ta_index, course_index] == 1:  # TA is assigned to this course
-                time_block = time_blocks[course_index]
+    # Find the Labs with time conflicts:
+    conflicting_labs = {}
+    for lab_id, time_id in sect_n[:, [0, 1]]:
+        if time_id in conflicting_labs:
+            conflicting_labs[time_id].append(lab_id)
+        else:
+            conflicting_labs[time_id] = [lab_id]
+    conflicting_labs_list = list(conflicting_labs.values())
+    # Find list of lists of conflicts
+    conflicts = find_conflicts(assignment, conflicting_labs_list)
 
-                # Check if the TA is already assigned to another course in this time block
-                if time_block in assigned_in_block:
-                    # Conflict: reset this course assignment to 0
-                    sol[ta_index, course_index] = 0
-                else:
-                    # No conflict: store the course as assigned in this time block
-                    assigned_in_block[time_block] = course_index
+    for conflict_group in conflicts:
+        # Process each conflict group
+        for ta_index in set(ta for ta, _ in conflict_group):
+            # Get all labs this TA is assigned to in the current conflict group
+            ta_conflicts = [lab for ta, lab in conflict_group if ta == ta_index]
 
-    return sol
+            if len(ta_conflicts) > 1:
+                # If there are conflicts, choose one lab to keep and set others to 0
+                keep_lab = np.random.choice(ta_conflicts)  # Randomly choose one lab to keep
+                for lab in ta_conflicts:
+                    if lab != keep_lab:
+                        resolved_assignment[ta_index, lab] = 0
+
+    return resolved_assignment
+
 
 
