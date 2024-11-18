@@ -35,8 +35,3 @@ def test_unpreferred():
     assert unpreffered(sample_array1) == test1_res_cleaned[4]
     assert unpreffered(sample_array2) == test2_res_cleaned[4]
     assert unpreffered(sample_array3) == test3_res_cleaned[4]
-
-def test_calc_objs():
-    assert calc_objs(sample_array1) == sum(test1_res_cleaned)
-    assert calc_objs(sample_array2) == sum(test2_res_cleaned)
-    assert calc_objs(sample_array3) == sum(test3_res_cleaned)

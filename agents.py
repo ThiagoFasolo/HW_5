@@ -75,7 +75,6 @@ def add_preferred_courses(sol):
 
     return sol
 
-
 @ profile
 def remove_time_conflicts(sol, time_blocks):
     # SAME ISSUE AS ABOVE
@@ -108,6 +107,5 @@ def remove_time_conflicts(sol, time_blocks):
                     assigned_in_block[time_block] = course_index
 
     return sol
-
 
 

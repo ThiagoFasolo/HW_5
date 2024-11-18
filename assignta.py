@@ -34,7 +34,7 @@ E.add_solution(array)
 E.add_solution(array1)
 
 print(E)
-E.evolve(time_limit=30, dom=100, status=100000, mutate = 4, mut_fact = 100)
+E.evolve(time_limit=30, dom=25, status=100000, mutate = 4, mut_fact = 100)
 print(E)
 
 Profiler.report()
