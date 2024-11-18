@@ -109,8 +109,8 @@ def resolve_time_conflicts(assignment):
     # Convert conflicting lab IDs into lists of conflicts
     conflicting_labs_list = list(conflicting_labs.values())
     # Find conflicts based on current assignment
-    conflicts = find_conflicts(assignment, conflicting_labs_list)
-    resolved_assignment = assignment.copy()
+    conflicts = find_conflicts(assignment[0], conflicting_labs_list)
+    resolved_assignment = assignment[0].copy()
 
     # Resolve each conflict
     for conflict_group in conflicts:
