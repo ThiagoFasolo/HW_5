@@ -109,3 +109,5 @@ def remove_time_conflicts(sol, time_blocks):
     return sol
 
 
+
+

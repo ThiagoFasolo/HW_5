@@ -1,8 +1,11 @@
 from itertools import product
 import numpy as np
 
+from criterias import overalloc, time_conflicts, undersupport, unwilling, unpreffered, testfiles
 from criterias import tas_n, sect_n
+from agents import mutating_agent, min_agent, min_agent_ran, add_preferred_courses
 from profiler import Profiler, profile
+from evo import Evo
 
 global tas_n
 global sect_n
@@ -33,28 +36,36 @@ def find_conflicts(assignment, conflicting_labs):
 
 @profile
 def generate_variants(base_matrix, conflicts):
+    # Initialize the list of all variant matrices
     variants = []
+
+    # Create a list of lists, where each sublist contains all possible configurations for each conflict group
     all_combinations = []
 
-    # Pre-allocate a matrix for each configuration to minimize copies
     for conflict_group in conflicts:
         group_combinations = []
-        template_matrix = base_matrix.copy()
         for coord in conflict_group:
-            # Reset only the needed parts of the matrix
-            template_matrix[:, conflict_group] = 0  # Reset all conflicted columns to 0
-            template_matrix[coord[0], coord[1]] = 1  # Set the current coordinate to 1
-            group_combinations.append(template_matrix.copy())
+            # Create a new copy of the base matrix for each possibility
+            temp_matrix = base_matrix.copy()
+            # Set all conflicted coordinates to 0
+            for c in conflict_group:
+                temp_matrix[c[0], c[1]] = 0
+            # Set the current coordinate to 1
+            temp_matrix[coord[0], coord[1]] = 1
+            group_combinations.append(temp_matrix)
         all_combinations.append(group_combinations)
 
-    # Use NumPy to accumulate results instead of summing at the end
+    # Generate the product of all combinations across all conflict groups
     for combination in product(*all_combinations):
-        combined_matrix = np.zeros_like(base_matrix)
-        for matrix in combination:
-            np.maximum(combined_matrix, matrix, out=combined_matrix)
+        # Combine matrices from each group into a single matrix
+        combined_matrix = sum(combination)
+        # Using 'minimum' to avoid overlapping 1's going beyond 1, if any
+        combined_matrix = np.minimum(combined_matrix, 1)
         variants.append(combined_matrix)
 
     return variants
+
+
 
 '''
 create all possible combinations of preferene matrixes where everyone is willing
