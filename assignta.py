@@ -6,6 +6,7 @@ from criterias import tas_n, sect_n
 from agents import mutating_agent, min_agent, min_agent_ran, resolve_time_conflicts
 from evo import Evo
 from profiler import Profiler, profile
+from create_pref_variants import create_prefs
 
 
 # Function to find and display the best solution
@@ -90,7 +91,7 @@ E.add_agent("min_agent", min_agent, k=2)
 E.add_agent("min_agent_ran", min_agent_ran, k=2)
 E.add_agent("resolve_time_conflicts", resolve_time_conflicts, k=1)
 # E.add_agent("add_preferred_courses", add_preferred_courses, k=1)
-# E.add_agent("", ___, k=num_sols_needed)
+# # E.add_agent("", ___, k=num_sols_needed)
 
 
 # Create random initial solution matrices
@@ -98,9 +99,12 @@ array = np.random.randint(0, 2, size=(len(sect_n), len(tas_n)))
 array1 = np.random.randint(0, 2, size=(len(sect_n), len(tas_n)))
 E.add_solution(array)
 E.add_solution(array1)
+# starts = create_prefs()
+# for start in starts:
+#     E.add_solution(start)
 
 # Evolve solutions
-E.evolve(time_limit=30, dom=25, status=100000, mutate=4, mut_fact=100)
+E.evolve(time_limit=300, dom=25, status=100000, mutate=4, mut_fact=100)
 
 # Find and display the best solution based on the evolved population
 best_solution = find_best_solution(E.pop)

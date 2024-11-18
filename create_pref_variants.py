@@ -1,16 +1,10 @@
 from itertools import product
 import numpy as np
-
-from criterias import overalloc, time_conflicts, undersupport, unwilling, unpreffered, testfiles
+import random
 from criterias import tas_n, sect_n
-from agents import mutating_agent, min_agent, min_agent_ran, add_preferred_courses
 from profiler import Profiler, profile
-from evo import Evo
-
 global tas_n
 global sect_n
-
-
 @profile
 def find_conflicts(assignment, conflicting_labs):
     conflicts = []
@@ -34,7 +28,6 @@ def find_conflicts(assignment, conflicting_labs):
     return conflicts
 
 
-@profile
 def generate_variants(base_matrix, conflicts):
     # Initialize the list of all variant matrices
     variants = []
@@ -55,6 +48,14 @@ def generate_variants(base_matrix, conflicts):
             group_combinations.append(temp_matrix)
         all_combinations.append(group_combinations)
 
+    # Shuffle the list in place
+    random.shuffle(all_combinations)
+
+    # Calculate the 1/5  size of the list
+    part = len(all_combinations) // 5
+    # Select the first
+    all_combinations = all_combinations[:part]
+
     # Generate the product of all combinations across all conflict groups
     for combination in product(*all_combinations):
         # Combine matrices from each group into a single matrix
@@ -66,32 +67,28 @@ def generate_variants(base_matrix, conflicts):
     return variants
 
 
+@profile
+def create_prefs():
+    '''
+    create all possible combinations of preferene matrixes where everyone is willing
+    '''
 
-'''
-create all possible combinations of preferene matrixes where everyone is willing
-'''
+    # Create solution where everyone has their preferences
+    pref_sol = tas_n[:, 2:]
+    # Replace all 1s and 2s with 0s; Replace all 3s with 1s
+    pref_sol[(pref_sol == 1) | (pref_sol == 2)] = 0
+    pref_sol[pref_sol == 3] = 1
 
-# Create solution where everyone has their preferences
-pref_sol = tas_n[:, 2:]
-# Replace all 1s and 2s with 0s; Replace all 3s with 1s
-pref_sol[(pref_sol == 1) | (pref_sol == 2)] = 0
-pref_sol[pref_sol == 3] = 1
+    # Find the Labs with time conflicts:
+    conflicting_labs = {}
+    for lab_id, time_id in sect_n[:, [0, 1]]:
+        if time_id in conflicting_labs:
+            conflicting_labs[time_id].append(lab_id)
+        else:
+            conflicting_labs[time_id] = [lab_id]
+    conflicting_labs_list = list(conflicting_labs.values())
+    # Find list of lists of conflicts
+    conflicts = find_conflicts(pref_sol, conflicting_labs_list)
 
-# Find the Labs with time conflicts:
-conflicting_labs = {}
-for lab_id, time_id in sect_n[:, [0, 1]]:
-    if time_id in conflicting_labs:
-        conflicting_labs[time_id].append(lab_id)
-    else:
-        conflicting_labs[time_id] = [lab_id]
-conflicting_labs_list = list(conflicting_labs.values())
-# Find list of lists of conflicts
-conflicts = find_conflicts(pref_sol, conflicting_labs_list)
-
-print('and now we wait... \n')
-# Create all solutions where no one has a time conflict:
-final_variants = generate_variants(pref_sol, conflicts)
-
-Profiler.report()
-print()
-print(final_variants)
+    # Create all solutions where no one has a time conflict:
+    return generate_variants(pref_sol, conflicts)
