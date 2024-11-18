@@ -65,7 +65,7 @@ def add_preferred_courses(sol):
     np.array: Updated solution matrix with preferred courses added where possible.
     """
     # Iterate over each TA and their preferred courses
-    for ta_index, courses in tas_n:
+    for ta_index, courses in tas_n[:, 2:]:
         # Check if the TA already has an assigned course
         if not np.any(sol[ta_index, :]):  # Ensure no other courses are assigned to this TA
             for course_index in courses:

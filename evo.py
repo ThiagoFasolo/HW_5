@@ -7,6 +7,7 @@ import copy
 from functools import reduce
 import numpy as np
 import time
+from profiler import profile, Profiler
 
 class Evo:
 
@@ -79,6 +80,7 @@ class Evo:
         nds = reduce(self.reduce_nds, self.pop.keys(), self.pop.keys())
         self.pop = {k: self.pop[k] for k in nds}
 
+    @ profile
     def evolve(self, time_limit=300, dom=100, status=1000, mutate = 4, mut_fact = 100):
         """ Run random agents with a time limit.
         time_limit: The maximum allowed time for running this method (in seconds).
