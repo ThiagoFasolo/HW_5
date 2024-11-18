@@ -3,7 +3,7 @@ from readfile import read_tasect
 import numpy as np
 from criterias import overalloc, time_conflicts, undersupport, unwilling, unpreffered, testfiles
 from criterias import tas_n, sect_n
-from agents import mutating_agent, min_agent, min_agent_ran, resolve_time_conflicts, add_preferred_courses
+from agents import mutating_agent, min_agent, min_agent_ran, add_preferred_courses
 from evo import Evo
 from profiler import Profiler, profile
 
@@ -88,7 +88,6 @@ E.add_objective("unpreffered", unpreffered)
 E.add_mut_agent(mutating_agent)
 E.add_agent("min_agent", min_agent, k=2)
 E.add_agent("min_agent_ran", min_agent_ran, k=2)
-E.add_agent("resolve_time_conflicts", resolve_time_conflicts, k=1)
 # E.add_agent("add_preferred_courses", add_preferred_courses, k=1)
 # E.add_agent("", ___, k=num_sols_needed)
 
