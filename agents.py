@@ -95,33 +95,30 @@ def find_conflicts(assignment, conflicting_labs):
             conflicts.append([(ta_index, lab) for lab in assigned_labs])
 
     return conflicts
-@ profile
-def resolve_time_conflicts(sol):
-    """
-    Resolve time conflicts by ensuring each TA is only assigned to one lab per conflicting time block.
-    """
-    # Copy the solution matrix
-    assignment = sol.copy()
 
-    # Find the Labs with time conflicts:
+
+@profile
+def resolve_time_conflicts(assignment):
+    # Create mapping of lab IDs to their corresponding time slots
     conflicting_labs = {}
     for lab_id, time_id in sect_n[:, [0, 1]]:
-        if time_id in conflicting_labs:
-            conflicting_labs[time_id].append(lab_id)
-        else:
-            conflicting_labs[time_id] = [lab_id]
-    conflicting_labs_list = list(conflicting_labs.values())
-    # Find list of lists of conflicts
-    conflicts = find_conflicts(assignment, conflicting_labs_list)
+        if time_id not in conflicting_labs:
+            conflicting_labs[time_id] = []
+        conflicting_labs[time_id].append(lab_id)
 
+    # Convert conflicting lab IDs into lists of conflicts
+    conflicting_labs_list = list(conflicting_labs.values())
+    # Find conflicts based on current assignment
+    conflicts = find_conflicts(assignment, conflicting_labs_list)
+    resolved_assignment = assignment.copy()
+
+    # Resolve each conflict
     for conflict_group in conflicts:
-        # Process each conflict group
         for ta_index in set(ta for ta, _ in conflict_group):
-            # Get all labs this TA is assigned to in the current conflict group
+            # Extract just the lab indices for the current TA's conflicts
             ta_conflicts = [lab for ta, lab in conflict_group if ta == ta_index]
 
             if len(ta_conflicts) > 1:
-                # If there are conflicts, choose one lab to keep and set others to 0
                 keep_lab = np.random.choice(ta_conflicts)  # Randomly choose one lab to keep
                 for lab in ta_conflicts:
                     if lab != keep_lab:
